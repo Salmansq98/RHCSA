@@ -1,0 +1,1064 @@
+Installing Redhat 9:
+
+Installing Disk: you can specify the custom partition, like (requirements are (/boot must be 1GiB(LVM is not supported by boot. Prefer standard partition and by default, it will select ‘xfs’ file system.), swap must be 1GiB and ‘/’ must be 6GiB (can be LVM)).
+
+While setting up root password, there are check boxes:
+Lock root account: when enabled, only administrator users are able to login.
+Allow root SSH login with password: it's a separate option to allow root user to use SSH login.
+By default, root user is unable to use SSH login.
+
+While installing you can create users as well. (you have to tick the check box to make administrator ‘make this user administrator’)
+
+Logging In:
+Avoid logging  in as root, because it has a higher risk of security related problems.
+
+Deploying RHEL in Cloud:
+In the cloud, RHEL is deployed, not installed.
+RHEL is different in cloud environments.
+Different cloud vendors have different procedures for boot.
+For RHCSA, we need to have access to GRUB boot prompt to troubleshoot booting.
+
+
+Shell: shell is an environment where the user interacts with the OS.
+
+Note: to increase the font size of the terminal use ‘Ctrl + shift + ‘+’ ‘.
+
+Note: For RHCSA, we are not going to do anything with the GNOME Graphical environment.
+
+
+Virtual Terminals:
+Terminal: A terminal is an environment that runs a shell.
+In a graphical environment, multiple terminals can be used on the same screen.
+In a text-based environment, one terminal is started from the console.
+Virtual terminals can be used to start additional terminal sessions. Which are accessible by using Ctrl[-Alt]-Fn keyboard sequences. (note: it won’t work in virtual environments, we are in virtual environments).
+
+‘Who’ and ‘w’ command to see which users currently are active on which terminals.
+‘Chvt’ to change between virtual terminals.
+
+Note: Linux is case sensitive.
+Note: mandb (8), here ‘8’ indicates it’s an administrator command.
+
+When you type a command if it shows ‘nothing appropriate’. (which means command not found).
+Note: In the newly built system there are not many manual pages. So, we need to manually trigger the rebuild of the mandb by typing ‘sudo mandb’.
+
+Finding the Right man page:
+Man -k or apropos to search the mandb based on a keyword.
+
+Editor: It’s a text editing tool. Used for modifying the text files.
+There are 2 commonly used editors:
+Nano
+Vi or vim(it’s an advance version of vi
+
+System administrator prefers to use the VIM editor.
+
+Few commands for VIM:
+Wq: save and quit
+/text: search for text in the file. (which will search in forward direction)
+?text: search for text in the backward direction.
+^: move to the start of the line.
+$: move to end of line.
+:%s/old/new/g: substitute(%s) all occurrences of “old” with “new” (globally(g) or into the entire file).
+Se number: which indicates the number of lines.
+
+
+Redirection( >, >> ) and Piping( | ):  redirection is a powerful feature that allows you to control the input and output of commands.
+
+STDIN: when you type commands on the terminal it will be an STDIN. 
+STDOUT: the output of the command which is displayed on the terminal is called STDOUT.
+STDERR: The output error can be sent to the null device(/dev/null).
+Ls > course	# add the out of ls to course and its new file.
+Echo ‘ dummy line’ >> course 	# appends the line of course.
+Ls lkjfkjahkjfhkafh 2> /dev/null	# basically, it’s an error and redirects its output to nowhere.	# ‘2>’ it is pronounced as standard error redirection.
+
+Piping: the output of a first command will be an input to the second command.
+Ex: man mandb  | grep 8
+
+Note: Ctrl-l , clears the screen.
+
+In Linux, both .bashrc and .bash_profile are configuration files for the Bash shell, and they are used to customize the behavior of the shell for individual users. 
+(.bashrc): Purpose: .bashrc is typically used for user-specific configurations and settings. It is executed each time a new Bash shell is started, whether it's an interactive shell or a non-login shell.
+When it is sourced: It is sourced for each new terminal session.
+In this file, user-specific file, subshell  variables can be defined.(resource: book)
+(.bash_profile)(prefer): Purpose: (.bash_profile) is used for login shell configurations. It is executed when a user logs in, either interactively or by executing a login shell. This file is generally used to set up environment variables and other settings that should only be done once per login session.
+When it is sourced: It is sourced when a user logs in.
+In this file, user-specific login shell variables can be defined.(resource: book)
+(.bashrc) is the user-specific version of /etc/bashrc. (/etc/bashrc is processed while opening a subshell. It’s generic. Note: not recommended to change)
+(.bash_profile) is the user-specific version of /etc/profile. ( /etc/profile is the generic Bash startup file containing all system settings that are processed in a login shell. Note: not recommended to change).
+
+Changing Environment variables:
+For temporary changes: 
+Use export    variable_name=value_name
+
+For Permanent changes or Persistent changes:
+In (.bash_profile), mention ‘export HISTSIZE=2000’
+And when you restart it, it will show on environment variables.
+
+History command:
+Recently used commands are stored in (~/.bash_history) and they are available beyond sessions.
+Note: These are environment variables, HISTSIZE governs the size of your command history within a single shell session(it’s an in-memory), while HISTFILESIZE dictates how many lines are retained in the history file on disk, spanning multiple sessions. It's common to set both variables to control the in-memory and on-disk history sizes.
+And HISTFILE is the location of a history file (.bash_history).
+
+Repeating Command from History:
+There are different ways to repeat commands from history:
+Use up arrow key, to scroll backward through history.
+!nn repeats a command from history based on its no. (Ex: !46)
+!a repeats the last command that starts with the letter ‘a’.
+Ctrl-r, performs a reverse search based on the pattern entered.
+
+
+Managing History:
+ History -w, synchronizes the current history from memory to history file(i.e .bash_history).
+History -c , clears the current history.(it won’t remove it from the file) And to remove it from the file use ‘history -w’
+History -d nn, removes line nn from the current history.
+Shell Expansion: it allows for more efficient command line use.
+Globbing also refers to wildcards. Ex: ls *, ls a?*, ls [a-e]*
+Brace expansion: touch file{1..9}, useradd{user1, user2, user3}
+Command substitution: ls -l $(which ls)  # the result of a command would be an input to the other command.
+? = It's a single character and it can be anything.
+* = these are multiple characters and they can be anything.
+[a-e]: it’s a range from (a, b, c, d, e).  # can be used for searching files.
+{1..10}:  it ranges from 1 to 10.	# can be used for creating a number of files.
+
+
+Escaping Special Character:
+Special meaning is taken away:
+Double quotes suppress globbing and shell expansion but do allow command and variable substitution. (and it will take away the meaning if there is a space( ))
+Ex: ls “ directory_1 directory_2”
+Single quotes take away the special meaning of any characters($, ?, /,…..).
+Ex: ls ‘directory_1’ # no output
+Backslash protects the following character only from expansion.
+Ex: echo “\$PATH”	#returns, $PATH
+
+Variables: 
+Variables are used to separate site-specific data from generic code.
+Shell comes with standard system variables in the environment.
+To define locally use export key=value.
+And to make it persistent, mention it in start up files( bash_profile).
+Defining your own variables is mainly useful in scripting.
+
+Alias:  Alias allows use to create custom commands
+To check current alias, ‘alias’
+To create new alias: ‘alias custom_command=value’
+To remove alias, ‘unalias custom_command’
+(To be Persistent): define alias in (.bash_profile) 
+
+Note: VDO is important 
+
+
+
+Note: to know the file-system hierarchy use, ‘man hier’.
+what's the purpose of /home, /var, /boot ….etc
+/usr: is like a program file in the Windows system.
+
+
+
+Finding Files: searching a file based on certain criteria.  Use, ‘find’ command
+
+Xargs: It takes input from a pipeline or from standard input and converts it into arguments for a command. This can be particularly useful when dealing with commands that do not accept input directly from standard input or when you want to perform a command on a list of items.
+Ex: find /etc -name ‘*’ -type f | xargs grep ‘127.0.0.1’
+Explanation: find will give you a list of files and xargs is taking it from the pipe and passing it to grep as one by one.
+
+Locate can also be used but the difference is locate uses a database. If you didn’t find a file then you need to update the database ‘updatedb’ command.
+
+
+Which command, it looks for binaries in $PATH, mainly it also searches for executable files.
+Ex: which ls	# output: /usr/bin/ls
+
+Mounting Filesystem:
+To access a device, it must be connected to a directory. It is called mounting the device.
+Ex: mount /device_name /mount_point
+
+Findmnt	# gives the information about the current devices and their mounting location.
+Lsblk		# gives insight about the available devices that are not mounted to the system.
+
+
+Links: Link is a pointer to a file in a different location.
+Imagine it as a shortcut.
+You can have the same file in different locations.
+2 types of links:
+Hard link created by using ‘ln’ command. It has a common inode. (if the original file is deleted, the hard link will still exist with it’s content in it)
+Note: if there is a different file system link cannot be created.
+Symbolic link created by using ‘ln -s’ command. It has a link with a hard link. (if the original file is deleted, symbolic link will not exist)
+
+Ex: usage: create a link in different locations (5 different locations) to add lines to each individual file, just add lines to the original file that has a link to it.
+
+
+Archiving and compressing files:
+Archive is a backup. 
+Compress is reducing the size of a file and compressing it.
+
+Ex: tar -cvf /file_location_with_name /source_files 		# create the archive files.
+   Tar -cJvf /file_location_with_name /source_files	# creates and compress(in xz format) the files
+Tar -tvf /tar_file_name		# list the files that are archived in the file. It won’t extract.
+Tar-xvf /tar_file_name -C /destination_addr 	#extracting the files. ‘C’ will specify the destination address.
+
+Compression Utilities:
+Gzip ( it does the fastest compression).(commonly used)
+ Bzip2 
+Zip
+Xz ( it compresses the file in less memory size).(commonly used)
+
+Common text tools:
+‘Less’ has advanced features like scrolling up and down. ( you can use more as well as. But prefer ‘less’).
+‘Head’ shows the starting lines of the file. (ex: head -n 10 file)
+‘Tail’ shows the last lines of the file (ex: tail -n 10 file)
+‘Cat’ displays the output of a file. (ex: cat file)
+‘Cut’ its a text command used to filter the output. (ex: cut -d : -f 5 /etc/passwd)
+(‘-d’ specifies the delimiter( meaning fields are separated by (:)), ‘-f’ specifies the column)
+Sort: to  sort the text.
+Tr: translates the command. (ex: echo HELLO | tr [:upper:] [:lower:])
+(here, convert upper case letters to lower case letters).
+Grep: (global regular expression pattern), used to search for a text in files. Or in output.
+Ex: ps aux | grep ssh | grep -v ‘grep’      # -v means exclude the ‘grep’
+
+More About the ‘grep’:
+Stands for (Generic regular expression parser) or (global regular expression print) 
+Regular expressions are text patterns. They are used by tools like grep…etc
+They should be in single quotes. (they look similar to globbing( shell wildcards) but they are not.)
+Ex: grep ‘a*’ a*		# ‘a*’ is a pattern. 
+Regular expression contains:
+‘.’= it could be any single character.
+‘*’= 0 or more characters.
+‘^’= calls as anchor. Meaning, the character starts with.
+‘$’ = character ends with.
+‘+’ = 1 or more characters. (extended regex).
+‘?’ = 0 or 1 character. (extended regex).
+‘Word\b’ = extract the text that ends with a ‘word’.
+Either option: grep -E ‘(svm | vmx)’ /filename. 	# it will find only one word.
+Note: Regex is used by grep, awk, sed, vim.
+
+To find multiple words in a file:
+Use: egrep ‘first_word|second_word’ filename.
+
+Command Awk: It’s a text filtering command used for data extraction and reporting.
+Ex: awk -F : ‘{ print $4 }’ /etc/passwd.  # -F is delimiter or field separator. # fourth column of /etc/passwd.
+
+Replace a text in file: 
+Sed: it is a stream editor. Can be used to search and replace a text in a file.
+Ex: sed ‘s/Jan/JAN/g’ filename	# s = string and g = global.
+
+
+Understanding Root user:
+Root user operates in kernel space.
+It's a user with unlimited privileges. You can Limit the privileges of a root user.
+Allow root SSH login with password: it's a separate option to allow root user to use SSH login.
+By default, root user is unable to use SSH login.
+
+Switch user(su): It is used to switch current user accounts from a shell environment.
+‘-’ option is used to get the complete environment of the target user.
+ Note: using ‘su -’ to open a root shell is considered BAD PRACTICE, use ‘sudo -i’(it opens root shell) instead.
+So, to perform administrative tasks no one has to know the root password. 
+Just add the user to the sudoers file.
+
+Sudo (super user do): It is a more secure mechanism to perform administration tasks.
+Behind the sudo there is Conf file /etc/sudoers,
+‘Visudo’ can be used to edit the conf file, it edits ‘/etc/sudoers.tmp’, and very detailed administrative privileges can be assigned.
+---------------------------------------------------------------------------------------------------------
+Note: Important stuff. (Managing sudo Configuration):
+Editing ‘/etc/suderos’ directly is not a SECURE WAY.
+‘Visudo’ command edits ‘/etc/sudoers.tmp’
+Instead of editing /etc/sudoers, consider creating drop-in files in ‘/etc/sudoers.d’.(PREFERRED for custom changes.) (which is a persistent way).
+(drop-in files are executable files, to find any executable file of a command use ‘which’.)
+
+Providing Administrator Access:
+Add a user to the ‘wheel’ group which will give administrator access.
+(Ex: usermod -aG wheel username).
+Do not enable the line ‘%wheel ALL=(ALL) NOPASSWD: ALL’ in ‘/etc/sudoers’.
+It will provide full sudo access without entering a password and is very dangerous.
+Meaning, It’s like giving root access without password which is NOT A SECURE WAY.
+(Not for RHCSA Exam) (when using sudo) If you don’t like entering your user password every five minutes increase authentication token expiration by adding the following line in ‘/etc/sudoers’:
+ “Defaults timestamp_type=global,timestamp_timeout=300”
+(when you enter the sudo password, a authentication token will be generated and it will be valid for 5min( 300 sec).
+
+
+Providing (sudo) access to specific tasks:
+Use drop-in files to provide admin access to specific tasks.
+i) lisa ALL=/usr/bin/useradd, /usr/bin/passwd
+(/usr/bin/useradd is an executable file. It's a generic rule and the second will be an exception rule.)
+User lisa has only sudo privileges for adding users and passwords. 
+Using command arguments to make the commands more specific:
+ii) %users ALL=/usr/bin/mount /dev/sdb, /usr/bin/umount /dev/sdb
+(‘%users’ indicates its group name. Group members of users can only mount to /dev/sdb and umount to it only.)(makes it more specific)
+Exception case:
+Linda ALL=/usr/bin/passwd, !/usr/bin/passwd root
+(user linda can change all users passwords except root user.) (which makes it more SECURE)
+
+
+User: What is a User?
+Ans: A user is a Security principle, User accounts are used to provide people or processes access to system resources.
+
+Processes are using System accounts.
+People are using regular User accounts.
+
+
+Settings up User Properties:
+User Properties can be set in ‘/etc/passwd’.
+
+
+User Management: commands:
+Useradd, usermod, userdel and passwd.
+
+
+
+Defining User Default Settings:
+
+(it must be done before creating the users) The persistent way is to edit the ‘/etc/login.def’ file.
+And When a new user account is created on a Linux system, the settings specified in /etc/login.defs are typically used as defaults for that user 
+(such as password aging policies, password length requirements,)
+If you want a few files to be present in the user home directory after the creation of users, put the files in ‘/etc/skel’. 
+
+
+Limiting user access: 
+
+Temporarily locking user account: 
+Usermod -L username	# locks an account.
+Usermod -U username	# unlocks an account.
+
+Setting up expiration date on user account:
+Usermod -e yy/mm/dd username
+
+Set ‘/sbin/nologin’ as the shell for users that are not intended to log in at all.
+Usermod -s /sbin/nologin username
+
+Note: to get the current status of a user, use ‘passwd -S username’
+And In ‘/etc/shadow’, if there is a ‘!’ mark before the encrypted password, it means the user account is locked.
+
+Group management:
+
+Commands: groupadd, groupmod (preferred when adding a user to a group), groupdel.
+
+Lid -g groupname    	# list out all the users that belong to groupname.
+Id username		# gives info of the user, like what group does it belong to.
+
+
+Managing Password Settings:
+Basic password settings can be set up in ‘/etc/login.defs’. (such as password aging policies, )
+Use ‘passwd or chage’ to set, min, max, warning days for a user.
+
+
+
+
+
+
+Changing Ownership: 
+Use, ‘chown  username:groupname filename’
+
+Changing permissions:
+Octal mode: Read(4), Write(2), Execute(1)
+
+To change permissions of a file: 
+Use ‘chmod’,
+In absolute mode, we will use numbers, like (700 means user has read, write, execute(4+2+1=7)).
+In relative mode, we will use letters like (u=user, g=group, o=others)
+
+
+Configuring shared group directories:
+Sharing a directory with the group members.
+Use, ‘chgrp group_name directory’  # changing the group ownership for group members.
+Set SGID, ‘chmod g+s directory’.
+
+Set sticky bit, ‘chmod o+t directory’. # Only the owner of the file or owner of the directory can delete the file.
+
+Note: parent directory has the highest precedence in terms of permissions.
+
+
+Applying Default permissions (on files and directories):
+
+Umask: Umask is a shell setting that subtracts umask from the default permissions.
+
+To be persistent: (In .bashrc):(user-specific)
+Mention ‘umask permissions’. Ex: umask 0002.
+# Ignore the first zero.
+Note: by default it won’t give execute permissions on files. Due to security reasons.
+
+For all users: mention in (/etc/bashrc): be cautious while editing it.
+
+
+Special permissions:
+SUID: it allows the file to run with the permissions of the file owner, rather than the permissions of the user who is executing it.
+
+SGID: it allows the file to run with the permissions of the group that owns the file,
+
+Sticky bit: it prevents the users from deleting a file except the owner of the file.
+Note: it can be set by using ‘chmod’.
+Access Control List: 
+It gives the file access to additional users. And it’s a secure way of giving access to a user.
+(on the file permissions it will show you the ‘+’ sign for additional access)
+Ex: setfacl -m u:user_name:rw  filename.
+Similarly, for groups 
+      Setfacl -m g:group_name:rwx  filename
+
+To get the access control list: use ‘ getfacl filename’
+
+
+Network Interface cards(NIC):
+
+To get the current running devices, use ‘ip link show’.
+To get the ip address, ‘ip a’
+
+Host name Resolution:
+To get the current hostname: use ‘hostname’
+To set the hostname: ‘hostnamectl hostname new_hostname’.
+(if the hostname doesn’t display on the shell, exit and re-enter into shell).
+Your hostname will be written in ‘/etc/hostname’.
+
+To resolve the hostnames, ‘/etc/hosts’ is a basic system for resolving hostnames.( It’s convenient only for local usage.)
+Ex: 172.20.10.0	example.com		ex.com
+Here, ex.com is FQDN(fully qualified domain name). Example.com can also be called with a short name as (ex.com)
+
+To resolve the DNS queries, ‘/etc/resolve.conf’ contains DNS client configuration.
+
+There are 2 systems for hostname resolution, ‘/etc/hosts and DNS(/etc/resolve.conf)’.
+The order of host name resolution is determined through ‘/etc/nsswitch.conf’.
+(name services switch = nsswitch)
+
+
+Analyzing Network Configuration:
+Ip is a networking command that is used to manage all aspects of IP networking. (it can be used for testing)
+To add a secondary Ip addr, use ‘ip address add/del dev device_name new_ip_addr’
+To show the route table, use ‘ip route show’
+To add a entry in route table, ‘ip route add ip_address via ip_address’
+Ip command is not a persistent command. Since it only runs on runtime. When your system reboot you’ll lose all your networking settings.
+NOte: to be persistent, use Network Manager.
+Note: it you don’t know the subnet mask, use /24. Recommended by sander.
+Network Manager: Network Manager is a systemd service that manages network configuration.
+Conf file (/etc/NetworkManager/system-connections).
+To manage there are 2 commands: nmcli and nmtui.
+
+Nmcli: Nmcli is the command line interface for Network Manager. It’s very powerful.
+
+Note: Non-privileged users that are logged in on the console can change network settings.
+Non-privileged users that are logged in through ssh cannot change.
+ if you log in via ssh, you’ll have less Network Manager permissions.
+
+Note: For the RHCSA Exam, use only ‘nmtui’. It’s fast and saves time in exams.
+
+Nmtui: Network Manager text user interface.
+
+Make sure you set up automatic (DHCP). Or else enter the given details.
+Select ‘Automatically connect and Available to all Users’ (important)
+
+Note: Network manager is a persistent way to set up network settings.
+
+‘Tracepath IP_addr’ 	#This command shows the entire networking path.
+
+Note: read the troubleshooting notes from ref_linux file.
+
+
+Common day to day Administrator tasks:
+Managing Software:
+
+For querying the packages: use ‘rpm -qa’
+
+Repository: it’s a collection of RPM package files with an index that contains the repository contents.
+In RHEL 9, yum is referring to the dnf command.
+
+Accessing Repositories, A RHEL system has to register using ‘subscription-manager’. It accesses repositories from online Red Hat repositories.
+Alternative to online repositories, repositories can be offered through Red Hat satellite.
+
+For Exam: there will be no Internet connection nor Red Hat Satellite available.
+We have to manually configure repository access.
+
+‘Dnf-config-manager  --add-repo=’url’’	is used to set up a repository.
+If the Dnf-config-manager is not working then the repository has to be set up manually.
+(First, repository has to be created to download the software)
+Repositories are created in ‘/etc/yum.repo.d/’. (3rd party repo’s can also be created and it also called as Repository client).
+(Note: repo’s must be saved as (.repo) )
+
+Create a file (BaseOS.repo), mention,
+[label]
+name=anyname
+baseurl=url
+enabled=1
+gpgcheck=0		# it is a security check # must be disabled, where the repo is defined.( for exam gpgcheck is awesome).
+
+Then save it. And you’ll be able to download the softwares.
+
+Q) enable a specific repo?
+2 ways to do it, 
+‘Yum-config-manager --enable  repo-id’
+Verify it by, using ‘yum repolist all’ or ‘yum repolist’
+
+If yum-config-manager is not present, then I have to do it manually.
+Yum repolist 		#list out all the repo’s.
+Then go to the redhat.repo file, enable the specific repo by mentioning enabled=1 in the repo section.
+Verify it by, using ‘yum repolist all’ or ‘yum repolist’
+
+
+Managing Packages: (Patch management)
+Dnf is a package manager that installs packages with its dependencies(automatically).
+Dnf list		# list installed packages.
+Dnf install package_name		# installing packages
+Dnf remove package_name		# removing the package
+Dnf history				# returns the history of dnf.
+
+To undo a dnf task:
+Dnf history undo serial_no
+
+
+Dnf group :  there are 2 groups, a regular group which consists of a collection of packages.
+And environment group which is a collection of packages and groups (it is used to install the packages based on specific usage pattern)
+
+Dnf group list		# list the install dnf group packages.
+Dnf group install “group_name”	# install the group packages.
+Dnf group list hidden		# list out the hidden packages.
+
+
+
+Modularity: Dnf used Modularity. Meaning, different versions of packages can be maintained in the same repository.
+RHEL 9 has 2 main repo:
+BaseOS has a core component for RHEL. Packages in BaseOS share the OS lifecycle.
+Appstream is used for packages that don’t have the same lifecycle as RHEL.(Appstream packages are offered as individual packages or as modules.
+Note: In RHEL 9, no modules are provided by default.
+
+Note: subscription manager is not important for Exam.
+
+
+Common Process Management: 
+Common process management includes scheduling priority and sending signals.
+Managing Shell jobs:
+Jobs are the tasks. And they are runned by individual users.
+Fg 1		#run a job as foreground and is PID
+Bg
+Command &		# run a job in the background.
+
+Monitoring Memory usage:
+Free -h	
+
+Observing the CPU load:
+Uptime		# tell’s how long your system is up and gives the load average of your system.
+
+Current running process:
+Ps
+
+How many cpu are there in my system?
+Ans: lscpu		
+Monitoring the load:
+Top	# top is a dashboard that allows you to monitor system activity.
+
+Managing Process Priorities:
+Nice is used to set the priorities for processes. (priority scale is - 20 to +19). (Negative means highest priority). (Positive means low priority.)
+A normal User can’t increase the priority. 
+Root user can increase the priority.
+Ex: nice -n priority_no command &
+Nice -n -1 dd if=/dev/zero of=/dev/null &	# priority is set to -1, and running as background process.
+# Resetting priority
+Renice -n priority_no -p process_ID
+Renice -n 8 -p 3084		# priority is set to 8 and process is 3084.
+
+To kill the process:
+Top can be used. (type k and send the signal) 
+Killall dd	# kills all the process that are ‘dd’
+Kill -9 PID	# kills the process with signal 9 and who has the PID.
+
+
+Tuning System Performance:
+Tuning Kernel Parameters:
+Sysctl can help us to tune kernel parameters.
+Sysctl -a 	# list out all the kernel parameters.
+To be persistent, mention the parameters in a file which must be present in ‘/etc/sysctl.d/’.
+Ex:
+Cat >> file_name<<EOF			# This is an Here document.
+Vm.swappiness = 70				# Kernel Parameter.
+EOF						# End of file.
+
+Note: sysctl has 1000 parameters. And the above solution is for a single parameter.
+To manage these all parameters, ‘Tuned’ is the solution.
+Tuned is a service. (tuned-adm is a tool, which will help to switch to a different tuning profile.)
+Tuned-adm list	# list all the profiles.
+Tuned-adm profile profile_name		# switch to profile profile_name.
+
+To make a custom profile: (It’s a persistent way).
+Create a directory with profile_name.
+Create a file (tuned.conf) in it and mention in the file your parameters.
+[sysctl]
+Vm.swappiness = 77
+# your profile will be automatically picked up by tuned service.
+To enable the tuned parameters, in ‘/etc/tuned/tuned-main.conf’, disable ‘reapply_sysctl = 0’ (which will disable sysctl)
+Switch to any tuning profile and then switch back to your profile.
+
+Loginctl: it’s a part of systemd, which manages users and sessions.
+Ex: loginctl list-users		# list the users.
+      Loginctl list-sessions	# list out all the sessions.
+
+You can even terminate the session with loginctl.
+
+
+
+Systemd Unit(systemctl):
+Systemd is a first process after loading the kernel and it manages everything.
+Systemctl is a management interface for systemd.
+
+Types of Unit:
+Systemd unit is used to start a process.
+Socket unit is used to monitor activities on port. If something is detected on ports a service will be started.
+Path unit is used to start service when activity is detected in the file system. If a file or directory is created a service will be started.
+Mount unit is used for mounting a file system.
+Timer unit is used to start service periodically or occasionally.  
+There are more Units but they are not relevant to the RHCSA exam.
+
+Note: Items started by systemd are referred to as Units.
+
+Managing the Services:
+Systemctl start service_name
+Systemctl stop service_name.
+
+Modifying Systemd Service Configuration:   (It will ask in exam)
+(before editing, set up the editor to vim, ‘export EDITOR=/usr/bin/vim’ (it can be done in the root environment.)
+Systemctl edit service_name		# it will edit the configuration file in /etc.
+
+Modify as you would like to.
+Restart=always		# if the service is killed, it will be restarted automatically.
+Restart=5s			# will be started after 5s.
+
+When it’s done, restart the service.
+
+Systemctl mask service_name	# it will prevent admins or users from starting the service.
+					# (its like strong disable)
+Systemctl unmask service_name	# it will remove the mask. Or it will unmask the service.
+
+Scheduling Options:
+Couple of Options for scheduling jobs:
+‘Systemd timers’ are the primary option for scheduling recurring jobs on RHEL 9.
+‘Crond’ is an older scheduling solution which is still supported and a bit easier to schedule custom tasks. ( is used for recurring jobs.)
+‘At’ is available to schedule non-recurring user tasks. (basically, jobs that have to be run only single time.)
+
+
+Creating Custom service and timer unit:
+New service will be created when a file is created in ‘/etc/systemd/system/service_name.service’
+Defining the parameters in this file,
+[Unit]
+Description= Description of the service.
+
+[Service]
+Type=oneshot			# it only runs once.
+ExecStart= /usr/bin/touch /tmp/myfile.txt 		# Execute parameter #creates a file in /tmp
+
+Creating a timer unit file in ‘/etc/systemd/system/service_name.timer’
+Mentioning the parameters,
+
+[Unit]
+Description=Description of a timer
+
+[Timer]
+OnCalendar=2024-03-23 09:10,20:00	# timer will start at 9:10 and 9:20 of 23-Mar-2024
+# OnCalendar=*:00/01	# it will start each minute.
+
+Check the status of the Timer, systemctl status service_name.timer
+Start the Timer, systemctl start service_name.timer.
+
+Note: Service name and the Timer name must be the same.
+Note: Sometimes you have to inform the deamon to pick up the changes in unit files, ‘systemctl daemon-reload’.
+Note: when the timer unit of a service is static don’t change anything(it’s a default ). (imp for exam).
+
+Note: Difference between service(systemd) and timer, Service (Systemd) unit is used to start a process, whereas Timer unit is used to start service occasionally.  
+
+Cron: It's a scheduling option. Crond is a service. 
+It checks the configuration to run a job occasionally.
+
+To schedule a job, drop-in files in ‘/etc/cron.d’
+(or) to schedule jobs on hourly, daily, weekly, monthly use ‘/etc/cron.{hourly, daily, weekly, monthly}
+They are used for scripts that have to be executed on a regular basis.
+Note: these scripts have the execute permission on it.
+
+Note: for creating user specific job use, ‘crontab -e’
+Ex: crontab -e		#opens a file
+Mention the parameters,
+1 * * * * logger message
+Anacron: it’s a service behind the cron that executes the jobs on a regular basis. But not at a specific time.
+It takes care of the jobs in, ‘/etc/cron.{hourly, daily, weekly, monthly}’
+
+At command: at is used to run a specific task on a specific time. But only at once.
+Ex: at time
+> touch filename	# creates a file.
+Ctrl-D
+Note: ‘atd’ must be running to execute at command.
+Atq 		# list the jobs of at.
+
+Configuring logs:
+Journalctl:
+Systemd-journald is a service that receives log messages from different locations, like kernel, boot, syslog…etc.
+To make journald persistent, 
+Create a directory in ‘/var/log/journal’,
+check ‘/etc/systemd/journal.conf’ and look for Storage=auto parameter. ( don’t be confused with the ‘#’ it’s just a default value).
+Restart the service. ( if it didn’t work out, reboot the system.)
+
+Note: Generic point, you can get info on any config file. Like ‘man journal.conf’ ( just type the exact file name.)
+Rsyslog: it’s a service that receives the logs from journald. And it can transfer the logs to external sources like a logging server.
+
+Conf. file is ‘/etc/rsyslog.conf’. For drop-in files ‘/etc/rsyslog.d/’ (Note: Generic point, ‘.d’ is for drop-in files.)
+
+Note: Facilities of rsyslog can be found in ‘man logger’. Like error = err. And more
+
+Partitions:
+Options for creating partitions in RHEL 9:
+Standard Partition. ( in this you have MBR(4 partitions and extend the last partitions) and GPT(128 partitions).
+LVM.
+Stratis.
+Fdisk  is the command that will create a partition.
+And select what type of partition you would like.
+Create a  mount point and mount the device in ‘/etc/fstab’ (which is a persistent way)
+Blkid		# gives you the UUID info.
+Lsblk		# list the block devices.
+Note: UUID will be printed after making the filesystem on the device.
+Note: lsblk -f, 	can also give UUID’s.
+You can even do it with systemd-mount. But prefer to use ‘/etc/fstab’ (will work in exam).
+Note:VDO(Virtual Data Optimizer) is not in Exam.
+
+Logical Volume Management:
+Create a device or partitions.
+Create a physical volume from the partitions  (command: pvcreate)
+Create a volume group (command: vgcreate)
+Create a LVM from volume group. (command: lvcreate)
+
+Stratis: 
+It’s a next generation file system which uses thin provisioning.
+Xfs file system comes free in stratis.
+
+Note: Stratis must be mounted with UUID. ( No device name should be used).
+
+In stratis, you don’t have to mention a specific amount of space. 
+
+Service must be started ‘system to start stratisd’
+Create a pool,’strati’s pool create pool_name device_name’
+
+Note: After creating the stratis pool and filesystem, use
+Stratis fs list	# list out the filesystem with device name
+And use this device name to get UUID with the command lsblk --output=UUID.
+Make sure to use the right UUID for mounting.
+
+To extend the pool with an extra device: use
+Stratis  pool add-data pool_name device_name.
+
+Stratis Snapshot: it’s not a backup but can be used as accessing deleted files.
+Device name must be used to mount the snapshot.
+And snapshots can be used as temporary usage.
+
+To create snapshot:
+Stratis fs snapshot pool_name file_system_name snapshot_name
+
+To verify that you can still access files from the snapshot even it’s deleted from the original location:
+Mount these snapshot:
+Mount device_snapshot_name mount_point
+
+Grub Boot Procedure:
+Changing Runtime parameters, at the Grub menu press e and look for the linux line in Grub 2 boot prompt and you can mention your parameters. ( not in a persistent way.)
+
+
+
+
+Changing grub parameters in persistent way,
+In /etc/default/grub, look for word linux and edit the parameter like removing the ‘rhgb quiet’.
+Note: ‘rhgb quiet’ is used to hide startup messages while booting.
+
+Verify whether you have the MBR partition or EFI. type ‘lsblk’, under the mounting point search for ‘/boot’. If it is, ‘/boot’ means its MBR partition. Then, type
+Grub2-mkconfig -o /boot/grub2/grub.cfg
+Else if it is, EFI then type,
+Grub2-mkconfig -o /boot/efi/EFI/redhat/grub.cfg
+
+And the final step is to reboot the system
+
+
+Managing the Systemd target:
+Systemd targets are groups of unit files.
+Mainly there are 4 targets: 
+Emergency.target: which has minimal units. (check it by systemctl list-dependencies.). Used for troubleshooting.
+Rescue.target:  which is more than an emergency target. It’s for a system that doesn’t work fully.
+Multi-user.target: in this, the system is fully functional but with no-graphical interface.
+Graphical.target: in this, the system is Fully functional with Graphical interface.
+
+Setting up the Default targets:
+Systemctl get-defaults		#  returns the current target that is being used.
+Systemctl set-defaults	 target_name		# sets up the target.
+
+Booting into Specific target:
+2 ways:
+Is to change in Runtime: systemctl isolate target_name
+In grub boot prompt, in linux line mention, systemd.unit=target_name.
+
+Troubleshooting Modes:
+Firmware → boot device → grub  → kernel (initramfs) → systemd → early states  → services → shell.
+
+For the RHSCA Exam, 
+Grub prompt is important,
+You can pass different parameters:
+Rd.break, it will stop right after loading the initramfs. (this step is used in RHEL 8)
+init=/bin/bash, it will enter later after the initramfs. ( for exam and for RHEL 9)( use it)
+When mentioned as ‘systemd.unit=emergency.target’, it will allow you to troubleshoot with minimal units. (after the systemd)
+If you have any issues with services, enter info rescue.target (after the early state.)
+
+
+Resetting Root Password or lost the root password: 
+Grub menu.
+Press e to go to the Grub prompt.
+In linux kernel line, mention ‘init=/bin/bash’. ( it will give you a shell)
+Mount it, ‘mount -o remount, rw /’
+Set up the root password, ‘passwd root’
+(Now let the Selinux now about the changes) #
+touch /.autorelabel
+(And tell the systemd as well ) 
+Exec /usr/lib/systemd/systemd
+
+
+Boot Debug shell:
+While booting if there is an error, open up the Debug shell.(press Ctrl + Alt + F9)
+But before these, there should be a service which must be up and enabled i.e Debug-shell.service.
+
+Troubleshooting file system: 
+ Most problems will occur in ‘/etc/fstab’. (specially, typo’s)
+
+If a file system is corrupted and unable to mount then use ( xfs_repair (xfs file system) and e2fsck ( ext2, ext3, ext4 file system )).
+
+Fragmentation can also be an issue. To resolve these,
+For XFS, use xfs_fsr
+For ext2,3,4 . use e2defrag
+
+
+Bash Scripting:
+It consists of List of commands that has to be executed sequentially.
+It’s an executable file.
+No need to compile.
+Components:
+Script must have executable permission.
+Script must have (.sh) extension.
+Script must start with ‘shebang’ i.e ‘#!/bin/bash’.
+Using Arguments and Variables:
+Variables can be used to define dynamic values
+Variables can be provided in many ways:
+key=value ( in the script).
+By providing an argument while running the script, the value of the argument is stored in the positional parameter $1.
+Ex: ./srcipt_name parameter1 parameter2
+Ex; color = red		# defining variable inside the script .
+Echo color		# print out the color.
+Echo $color		# print out the value of color. Or accessing the variable
+Read color		# read takes the user input and saves in the variable.
+Note: ‘$@’ will give you all the arguments that were passed while executing the script.
+Ex: echo this are all the arguments: $@
+
+Note: ‘exit ‘ is used to tell whether a program was executed successfully or not. ‘Exit 0’ means successfully.
+Conditional statement:
+‘Test’ is used to test the condition.		# test = [ ]  # check man test
+Ex:
+If [ - z $1]		# checking the string is zero or not.
+Then
+	Echo there was no argument.
+	Exit 4					# exit statement and it could have any number.
+Fi					# fi is used to end the if statements
+
+Ex2: 
+If test - f  $2 
+Then
+	Echo its a file
+Else
+	Echo if is not a file
+Fi.
+
+Note: to check the exit status, use ‘echo $?’
+
+Note: ‘bash -x script_name’	# give you the detailed execution of the script.
+
+Loops:
+While: 
+While [ $counter -gt 0]
+do 
+ 	Echo $counter
+	counter=$((counter - 1))		# calculations are done like these in linux.
+Done
+
+
+
+
+For:
+For item in list
+Do 
+	Echo accessing the $item		# accessing the item.
+done
+	
+SSH(Secure Shell): allows you to login securely into linux machines.
+
+Setting up ssh key-based login:
+Need to have a client and server machines.
+From client machine:
+Create public and private keys. Use ‘ssh keygen’
+To add an additional layer of security to ssh, use passphrase.
+Copy the keys to the remote server. Use ‘ssh-copy-id server_ip or remote_hostname’
+Note: Conf file for Ssh are:
+‘/etc/ssh/sshd_config’ (works for server) (and it’s generic) ( to allow root user to login into server enable parameter in this file).
+‘~/.ssh/ssh_config’ ( it’s for root user or specific user)
+
+SSH server Options: (file : /etc/ssh/sshd_config)
+Port 22
+PermitRootLogin
+PubkeyAuthentication  	# it’s enabled by default.
+PasswordAuthentication
+AllowUsers 	# allows limited users to login  # It can make the server more secure.
+DenyUsers	# denies users to login.
+X11Forwarding
+
+Copying file securely:
+Scp and sftp are the commands for copying the file securely. They use port 22.
+
+Synchronizing files securely:
+Rsync is the command for it . and it uses ssh.
+
+
+NOTE: NETWORK SECURITY LESSONS LATER. WHEN MACHINES ARE READY.
+Need to check on Swap space and how to extend it.
+
+Httpd: It’s an apache web server.
+Note: It’s not important for RHCSA but vital for SELinux.
+
+Notes: Ignore the Automatic Installations: Kickstart. Because it’s not in the syllabus.
+
+
+SELinux: ( Security Enhanced Linux)
+It provides complete and mandatory security solutions.(it’s a kernel level security module).
+It secures Files, Directories, Ports and processes.
+
+States of SELinux:
+Enabled and Disabled.
+SELinux Modes:
+In Enable, there are Enforcing (Fully functional) and Permissive ( it’s won’t block everything but it will log everything)
+
+Note: To change the States or Modes of Selinux, reboot the system go to GRUB Boot loader and pass kernel parameter as: (It’s for Runtime)
+Selinux=0		# Disable Selinux.
+Selinux=1		# Enable Selinux.
+Enforcing=0		# Permissive mode.
+Enforcing=1		# Enforcing mode.
+
+To be persistent: (but not recommended to change).
+Conf file: ‘/etc/sysconfig/selinux’
+
+To get the current status: ‘getenforce’
+To set the mode: ‘setenforce mode_name’
+
+Additional Points for SELinux:
+Components of SELinux:
+Selinux works with context labels.
+Context labels are the Selinux permissions.
+Context labels are applied to source objects(Users, Processes) and target objects( Files, Directories and Ports)
+Selinux policy has many rules to define which source context has access to which target context.
+Managing SELinux:
+Context management is about applying contexts to mostly files, directories and ports.
+You’ll need to apply a context that matches a specific rule.
+
+Selinux Context Label: (basically, Selinux permissions)
+Note: only type is important for RHSCA exam.
+When creating or copying the file, it will inherit the parent permissions or properties.
+When moving the file, it will preserve the permissions or properties.
+Note: Find out if there is an issue by SELinux. Check the logs of selinux ‘/var/log/audit/audit.log’
+Grep ‘AVC’ /var/log/audit/audit.log’.
+Commands: 			#check the /var/www/html(for finding the right context label.)
+Semanage-fcontext -a -t httpd_sys_t ‘/web’		# it will be written into policy.
+# Check whether it wrote to file system by ‘ls -Z’ 
+Restorecon -Rv /web			# it will write on to the file system.
+Note: If the above command doesn’t work try reboot the system. And try the above command again to the file context.
+
+Finding the Right COntext: ( what context type should i apply on the file or directory)
+Check the default configuration context setting. Ex: check the /var/www/html(for finding the right context label.)
+Man pages from ‘selinux-policy-doc’
+Use ‘sealert’
+
+Managing Ports in SELinux:
+The SELinux policy is configured to allow default port access.
+For any non-default port access, use ‘semanage-port’
+Command: Semanage port -a -t ssh_port_t -p tcp 222
+If there is an issue that ssh isn’t working, try to run above command.
+
+Setting up SElinux Boolean:
+Getseboolean -a		# set all selinux boolean’s
+Setseboolean -P boolean_name		# set up the boolean and ‘P’ specifies its persistence.
+
+Sealert: it’s a SELinux troubleshooting command line tool.
+Ex: journalctl | grep sealert		# check the logs and look for sealert.
+	# recommend to run the below command. 
+Sealert -l UUID		# it will recommend the solution. With the confidence level.
+
+
+TroubleShooting SELinux:
+If you think that SELinux is blocking access, try to change the modes and try.
+Check the logs of SELinux. Look at the context, source and target.
+journalctl | grep sealert	# read the alert messages.
+
+
+Network Security:
+Firewalld is the service that manages the network security of the system.
+What traffic is allowed in.
+By default it blocks all the incoming traffic.
+Command: firewall-cmd --list-all		# prints the current rules.
+Firewall-cmd --add-service=http
+Have to run the above command again with ‘--permanent’.  # to be persistent.
+There are other options:
+--add-port=port_no/protocol(tcp or udp)
+--add-source=ip-address	#to block traffic from specific ip.
+Note: Just replace ‘remove’ with ‘add’. To remove things.
+
+NTP Client:
+Chronyd is the service used for time synchronization.
+Conf: ‘/etc/chronyc.conf’
+Restart the service. (after making changes.) 
+
+Automount (Autofs):
+NFS server and Nfs export must be available. (server)
+‘Autofs’ must be installed and service must be enabled and run. (Note:This and below steps must be done on the client server.)
+‘/etc/auto.master’	 # is the file which is managed by Autofs. Mentioning the mount point and configuration of it.
+Ex: /mounting_point	/config_file_location
+‘/etc/auto.mnt’		# mentioning the sub-file of the mount, options with nfs-server-path.
+For home directories use this line  ‘*	  -rw	nfs_server:/home/directory/&’.
+Ex: example could be found in ‘/etc/auto.misc’.
+
+Then restart the service and verify it by ‘mount command’.
+
+
+Containers:
+Login to Register: 
+Podman login register_url.
+Note: Conf file for Registries is ‘/etc/containers/registries.conf’
+
+Images:
+Managing Images:
+Podman pull image_name,
+Podman images 	# lists all images.
+Podman rmi		# remove image. Or images.
+Managing Containers: commands ,
+Podman run, podman start, podman stop, podman rm…….
+Note: check the ‘man podman’	# for options and more commands.
+
+Skopeo inspect image_url	# it inspects the image from the register without even pulling it.
+
+Podman inspect image_url	# it inspects the image. But I need to pull the image first.
+
+Note:  Image can be created in 2 ways, 	
+From the container file. (run ‘podman build image_name’). (ex: podman build -t image_name location_of_container_file)
+From a container. (start and make changes in container and then run podman commit)
+
+
+
+
+Port Mapping:
+Podman run -d -p host_machine_port_no:container_port_no --name=container_name
+Note: Once you have exposed a port in Podman , you can access the container using the exposed port on the host machine.
+Ex: if you exposed port 80 on the container and mapped it to port 8080 on the host machine, you can access the container by opening a web browser and navigating to ‘http://Ip_address:8080’
+Note: Rootless containers can only map to a non-privileged port (higher than 1024)
+
+Configuring Variables: (passing variables to container)
+Podman run --name=mariadb -e ROOT_PASSWORD=password image_name
+
+Persistent storage:
+Create a directory. And check the Selinux context.
+Then run ‘podman run -d --name=name -e variables -v /host_location:/container_destination:Z image_name  # starts the container and changes the existing selinux context. ( so that you can access the directory of the bind-mount.) (here, ‘:Z’ is important for SElinux).
+
+Starting a Container with Systemd Service:
+
+Create a user only to run all the rootless containers
+Start a container with these new user.
+Then generate a systemd service file, ‘podman generate systemd --files --new --name container_name’. (Note: It must be created in user directory like (.config/systemd/user/file)(for root user, ‘/etc/systemd/file’)
+A file will be generated as a service file. And check in file, whether it has ‘WantedBy=default.target’ 
+(you made the changes)Let the demon know about the changes. ‘Systemctl --user daemon-reload’
+Systemctl --user start file_name.
+
+Note: These new user must be logged in from SSH or login UI.
+
+Creating an image from ContainerFile:
+Containerfile must be present in the current directory.
+‘Podman build -t image_tag .’
